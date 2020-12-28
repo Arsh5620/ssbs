@@ -5,7 +5,7 @@
 int
 main (int argc, char **argv)
 {
-    for (int i = 0; i < 1000000; ++i)
+    // for (int i = 0; i < 1000000; ++i)
     {
         float random = rand () * 22.0f / 7.0f;
         long long_value = rand () * rand ();
@@ -14,8 +14,13 @@ main (int argc, char **argv)
         serializer_t serializer = serializer_init ();
         serializer_add_float (&serializer, "NULL", random);
         serializer_add_long (&serializer, NULL, long_value);
-        serializer_add_blob (&serializer, NULL, string, strlen (string));
+        serializer_add_blob (&serializer, "Something more", string, strlen (string));
         serializer_add_eof (&serializer);
+
+        FILE *file = fopen ("serialized", "wb+");
+        fwrite (serializer.memory, sizeof(char), serializer.index, file);
+        fflush (file);
+        fclose (file);
 
         deserializer_t deserializer = deserializer_init (serializer.memory, serializer.index);
 
@@ -35,7 +40,8 @@ main (int argc, char **argv)
 
         if (second_result->value_1 != long_value)
         {
-            printf ("FAILED on long, expected %ld, found %ld\n", long_value, second_result->value_1);
+            printf (
+              "FAILED on long, expected %ld, found %ld\n", long_value, second_result->value_1);
         }
 
         if (memcmp (third_result->value_2, string, strlen (string)))
