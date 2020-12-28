@@ -1,4 +1,5 @@
 #include "serializer.h"
+#include <assert.h>
 
 bool_t is_little_endian = 0;
 
@@ -22,8 +23,8 @@ serializer_t
 serializer_init ()
 {
     serializer_t serializer = {0};
-    serializer.memory = (char *) malloc (4096);
-    serializer.size = 4096;
+    serializer.memory = (char *) malloc (10);
+    serializer.size = 10;
 
     is_little_endian = endianness_test ();
     return serializer;
@@ -128,8 +129,38 @@ serializer_add_binary (serializer_t *serializer, serialization_types_t type, cha
         serializer->index += copy_size;
     }
 
+    // To avoid calling this check everywhere instead add 32
+    if (serializer->index + size + 32 > serializer->size)
+    {
+        serializer_allocate_if_required (serializer, size);
+    }
+
     memcpy (serializer->memory + serializer->index, data, size);
     serializer->index += size;
+}
+
+void
+serializer_allocate_if_required (serializer_t *serializer, long additional_size)
+{
+    size_t copy = serializer->index;
+    serializer->size += (4096 + additional_size);
+
+    char *address = realloc (serializer->memory, serializer->size);
+
+    if (NULL == address)
+    {
+        address = calloc (serializer->size, 1);
+        assert (address != NULL);
+
+        memcpy (address, serializer->memory, copy);
+        free (serializer->memory); /* free the original memory space after copy */
+    }
+    else
+    {
+        /* zero the memory after list->count elements */
+        memset (address + copy, 0, serializer->size - copy);
+    }
+    serializer->memory = address;
 }
 
 int

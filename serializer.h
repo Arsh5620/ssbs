@@ -83,5 +83,6 @@ serializer_add_type (
   serializer_t *serializer, serialization_types_t type, bool_t has_key, long size);
 int
 serializer_add_binary (serializer_t *serializer, serialization_types_t type, char *data, int size);
-
+void
+serializer_allocate_if_required (serializer_t *serializer, long additional_size);
 #endif
