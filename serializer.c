@@ -124,7 +124,7 @@ serializer_add_binary (serializer_t *serializer, serialization_types_t type, cha
 {
     if (type == SERIALIZATION_TYPE_BLOB)
     {
-        int copy_size = serializer_get_intsize (size) + 1;
+        int copy_size = 1 << serializer_get_intsize (size);
         memcpy (serializer->memory + serializer->index, &size, copy_size);
         serializer->index += copy_size;
     }

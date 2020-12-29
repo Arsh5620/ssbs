@@ -1,5 +1,5 @@
 from collections import namedtuple
-import serialization_types
+import serializetypes
 import struct
 
 deserializer_value = namedtuple(
@@ -16,7 +16,7 @@ def deserialize_all(byte_data):
 
     while (index < size):
         parse, index = deserialize_next(byte_data, index, size)
-        if (parse.read_type == serialization_types.SERIALIZATION_TYPE_EOF):
+        if (parse.read_type == serializetypes.SERIALIZATION_TYPE_EOF):
             break
         list.append(parse)
 
@@ -31,8 +31,8 @@ def deserialize_next(byte_data, index, size):
     byte_size = 1 << (magic & 0b11)
     index += 1
 
-    if (read_type == serialization_types.SERIALIZATION_TYPE_EOF):
-        return deserializer_value(serialization_types.SERIALIZATION_TYPE_EOF, 0, 0, 0, 0), index
+    if (read_type == serializetypes.SERIALIZATION_TYPE_EOF):
+        return deserializer_value(serializetypes.SERIALIZATION_TYPE_EOF, 0, 0, 0, 0), index
 
     key = 0
     if (has_key):
@@ -44,7 +44,7 @@ def deserialize_next(byte_data, index, size):
     value = byte_data[index: index + byte_size]
     index += byte_size
 
-    if (read_type == serialization_types.SERIALIZATION_TYPE_BLOB):
+    if (read_type == serializetypes.SERIALIZATION_TYPE_BLOB):
         long_buffer = bytearray(8)
         long_buffer[0:len(value)] = value
         if (little_endian == True):
@@ -61,15 +61,13 @@ def deserialize_next(byte_data, index, size):
 
 def deserialize_primitive(little_endian, type, value):
     endianess = "<" if little_endian else ">"
-    if (type == serialization_types.SERIALIZATION_TYPE_CHAR):
+    if (type == serializetypes.SERIALIZATION_TYPE_CHAR):
         return struct.unpack(endianess + "c", value)[0]
-    elif (type == serialization_types.SERIALIZATION_TYPE_SHORT):
+    elif (type == serializetypes.SERIALIZATION_TYPE_SHORT):
         return struct.unpack(endianess + "h", value)[0]
-    elif (type == serialization_types.SERIALIZATION_TYPE_INT):
+    elif (type == serializetypes.SERIALIZATION_TYPE_INT):
         return struct.unpack(endianess + "i", value)[0]
-    elif (type == serialization_types.SERIALIZATION_TYPE_LONG):
+    elif (type == serializetypes.SERIALIZATION_TYPE_LONG):
         return struct.unpack(endianess + "q", value)[0]
-    elif (type == serialization_types.SERIALIZATION_TYPE_FLOAT):
-        return struct.unpack(endianess + "f", value)[0]
-    elif (type == serialization_types.SERIALIZATION_TYPE_DOUBLE):
+    elif (type == serializetypes.SERIALIZATION_TYPE_FLOAT or type == serializetypes.SERIALIZATION_TYPE_DOUBLE):
         return struct.unpack(endianess + "d", value)[0]
