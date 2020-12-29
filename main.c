@@ -12,9 +12,11 @@ main (int argc, char **argv)
         char *string = "some value!!";
 
         serializer_t serializer = serializer_init ();
-        serializer_add_float (&serializer, "NULL", random);
-        serializer_add_long (&serializer, NULL, long_value);
-        serializer_add_blob (&serializer, "Something more", string, strlen (string));
+        serializer_add_float (&serializer, "NULL", 12.12344);
+        serializer_add_long (&serializer, "NULL", 1212344);
+        serializer_add_blob (&serializer, "NULL", "1212344", 7);
+        serializer_add_double (&serializer, "NULL", 1212344.1232333);
+        
         serializer_add_eof (&serializer);
 
         FILE *file = fopen ("serialized", "wb+");
@@ -24,6 +26,7 @@ main (int argc, char **argv)
 
         deserializer_t deserializer = deserializer_init (serializer.memory, serializer.index);
 
+        return;
         volatile my_list_s result = deserialize_all (&deserializer);
         volatile deserializer_value_t *first_result
           = (deserializer_value_t *) my_list_get (result, 0);
