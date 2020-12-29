@@ -29,6 +29,8 @@ def serializer_add(serializer_memory, key, value):
     elif isinstance(value, str):
         serializer_memory += (value.encode())
 
+def serializer_add_eof(serializer_memory):
+    serializer_memory.append(serializetypes.SERIALIZATION_TYPE_EOF << 4)
 
 def serializer_add_key(serializer_memory, key):
     if not key is None:

@@ -16,11 +16,7 @@ if __name__ == "__main__":
     serialize_memory = bytearray(0)
     serialize.serializer_add(
         serialize_memory, "some key", 111.00)
-    serialize.serializer_add(
-        serialize_memory, "some key", 11100)
-    serialize.serializer_add(
-        serialize_memory, "some key", "11100")
-
+    serialize.serializer_add_eof(serialize_memory)
     file = open("pythonserialize", "wb")
     file.write(serialize_memory)
     file.close()
