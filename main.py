@@ -4,8 +4,9 @@ import deserialize
 import serialize
 
 if __name__ == "__main__":
-    if (os.path.isfile("pythonserialize")):
-        input_file = open("pythonserialize", "rb")
+    file_name = "serialized"
+    if (os.path.isfile(file_name)):
+        input_file = open(file_name, "rb")
         byte_data = input_file.read()
 
         deserialized = deserialize.deserialize_all(byte_data)

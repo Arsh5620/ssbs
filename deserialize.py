@@ -69,5 +69,7 @@ def deserialize_primitive(little_endian, type, value):
         return struct.unpack(endianess + "i", value)[0]
     elif (type == serializetypes.SERIALIZATION_TYPE_LONG):
         return struct.unpack(endianess + "q", value)[0]
-    elif (type == serializetypes.SERIALIZATION_TYPE_FLOAT or type == serializetypes.SERIALIZATION_TYPE_DOUBLE):
+    elif (type == serializetypes.SERIALIZATION_TYPE_FLOAT):
+        return struct.unpack(endianess + "f", value)[0]
+    elif(type == serializetypes.SERIALIZATION_TYPE_DOUBLE):
         return struct.unpack(endianess + "d", value)[0]
