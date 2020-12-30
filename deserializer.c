@@ -3,7 +3,7 @@
 
 extern bool_t is_little_endian;
 
-deserializer_t
+inline deserializer_t
 deserializer_init (char *memory, int size)
 {
     deserializer_t deserializer = {0};
@@ -14,7 +14,7 @@ deserializer_init (char *memory, int size)
     return deserializer;
 }
 
-deserializer_value_t
+inline deserializer_value_t
 deserialize_next (deserializer_t *deserializer)
 {
     deserializer_value_t deserialized = {0};
@@ -60,10 +60,8 @@ deserialize_next (deserializer_t *deserializer)
 }
 
 my_list_s
-deserialize_all (deserializer_t *deserializer)
+deserialize_all (deserializer_t *deserializer, my_list_s list)
 {
-    my_list_s list = my_list_new (16, sizeof (deserializer_value_t));
-
     while (deserializer->index < deserializer->size)
     {
         deserializer_value_t value = deserialize_next (deserializer);

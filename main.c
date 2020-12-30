@@ -5,54 +5,20 @@
 int
 main (int argc, char **argv)
 {
-    // for (int i = 0; i < 1000000; ++i)
+    char *string = "some value!!";
+
+    serializer_t serializer = serializer_init ();
+    my_list_s list = my_list_new (16, sizeof (deserializer_value_t));
+
+    for (int i = 0; i < 100000; ++i)
     {
-        float random = rand () * 22.0f / 7.0f;
-        long long_value = rand () * rand ();
-        char *string = "some value!!";
-
-        serializer_t serializer = serializer_init ();
-        serializer_add_float (&serializer, "NULL", 12.12344);
-        serializer_add_long (&serializer, "NULL", 1212344);
-        serializer_add_blob (&serializer, "NULL", "1212344", 7);
-        serializer_add_double (&serializer, "NULL", 1212344.1232333);
-        
+        serializer_reset (&serializer);
+        serializer_add_blob (&serializer, "NULL", 4, string, 13);
         serializer_add_eof (&serializer);
-
-        FILE *file = fopen ("serialized", "wb+");
-        fwrite (serializer.memory, sizeof(char), serializer.index, file);
-        fflush (file);
-        fclose (file);
 
         deserializer_t deserializer = deserializer_init (serializer.memory, serializer.index);
 
-        return;
-        volatile my_list_s result = deserialize_all (&deserializer);
-        volatile deserializer_value_t *first_result
-          = (deserializer_value_t *) my_list_get (result, 0);
-        volatile deserializer_value_t *second_result
-          = (deserializer_value_t *) my_list_get (result, 1);
-        volatile deserializer_value_t *third_result
-          = (deserializer_value_t *) my_list_get (result, 2);
-
-        float result_float = *(float *) &first_result->value_1;
-        if (result_float != random)
-        {
-            printf ("FAILED on float, expected %f, found %f\n", random, result_float);
-        }
-
-        if (second_result->value_1 != long_value)
-        {
-            printf (
-              "FAILED on long, expected %ld, found %ld\n", long_value, second_result->value_1);
-        }
-
-        if (memcmp (third_result->value_2, string, strlen (string)))
-        {
-            printf ("FAILED on string !!\n");
-        }
-
-        my_list_free (result);
-        serializer_free (serializer);
+        list.count = 0;
+        my_list_s result = deserialize_all (&deserializer, list);
     }
 }

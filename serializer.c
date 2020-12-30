@@ -3,7 +3,7 @@
 
 bool_t is_little_endian = 0;
 
-bool_t
+inline bool_t
 endianness_test ()
 {
     char value = 77;
@@ -19,107 +19,109 @@ endianness_test ()
     }
 }
 
-serializer_t
+inline serializer_t
 serializer_init ()
 {
     serializer_t serializer = {0};
-    serializer.memory = (char *) malloc (10);
-    serializer.size = 10;
+    serializer.memory = (char *) malloc (4096);
+    serializer.size = 4096;
 
     is_little_endian = endianness_test ();
     return serializer;
 }
 
-void
+inline void
+serializer_reset (serializer_t *serializer)
+{
+    serializer->index = 0;
+}
+
+inline void
 serializer_free (serializer_t serializer)
 {
     free (serializer.memory);
 }
 
-serializer_key_t
-serializer_key (char *key)
+inline char
+serializer_min (int value, int min)
 {
-    int str_len = strlen (key);
-    serializer_key_t key_value = {0};
-    key_value.string = key;
-    key_value.size = str_len > 255 ? 255 : str_len;
-    return key_value;
+    return (char) (value > min ? min : value);
 }
 
 void
-serializer_add_char (serializer_t *serializer, char *key, char value)
+serializer_add_char (serializer_t *serializer, char *key, int key_length, char value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_CHAR, key != NULL, 0);
-    serializer_add_key (serializer, key);
+    serializer_add_key (serializer, key, key_length);
     serializer_add_binary (serializer, SERIALIZATION_TYPE_CHAR, (char *) &value, sizeof (char));
 }
 
 int
-serializer_add_short (serializer_t *serializer, char *key, short value)
+serializer_add_short (serializer_t *serializer, char *key, int key_length, short value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_SHORT, key != NULL, 0);
-    serializer_add_key (serializer, key);
+    serializer_add_key (serializer, key, key_length);
     serializer_add_binary (serializer, SERIALIZATION_TYPE_SHORT, (char *) &value, sizeof (short));
 }
 
 void
-serializer_add_int (serializer_t *serializer, char *key, int value)
+serializer_add_int (serializer_t *serializer, char *key, int key_length, int value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_INT, key != NULL, 0);
-    serializer_add_key (serializer, key);
+    serializer_add_key (serializer, key, key_length);
     serializer_add_binary (serializer, SERIALIZATION_TYPE_INT, (char *) &value, sizeof (int));
 }
 
 void
-serializer_add_long (serializer_t *serializer, char *key, long value)
+serializer_add_long (serializer_t *serializer, char *key, int key_length, long value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_LONG, key != NULL, 0);
-    serializer_add_key (serializer, key);
+    serializer_add_key (serializer, key, key_length);
     serializer_add_binary (serializer, SERIALIZATION_TYPE_LONG, (char *) &value, sizeof (long));
 }
 
 void
-serializer_add_float (serializer_t *serializer, char *key, float value)
+serializer_add_float (serializer_t *serializer, char *key, int key_length, float value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_FLOAT, key != NULL, 0);
-    serializer_add_key (serializer, key);
+    serializer_add_key (serializer, key, key_length);
     serializer_add_binary (serializer, SERIALIZATION_TYPE_FLOAT, (char *) &value, sizeof (float));
 }
 
 void
-serializer_add_double (serializer_t *serializer, char *key, double value)
+serializer_add_double (serializer_t *serializer, char *key, int key_length, double value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_DOUBLE, key != NULL, 0);
-    serializer_add_key (serializer, key);
+    serializer_add_key (serializer, key, key_length);
     serializer_add_binary (serializer, SERIALIZATION_TYPE_DOUBLE, (char *) &value, sizeof (double));
 }
 
 void
-serializer_add_blob (serializer_t *serializer, char *key, char *value, long size)
+serializer_add_blob (serializer_t *serializer, char *key, int key_length, char *value, long size)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_BLOB, key != NULL, size);
-    serializer_add_key (serializer, key);
+    serializer_add_key (serializer, key, key_length);
     serializer_add_binary (serializer, SERIALIZATION_TYPE_BLOB, value, size);
 }
 
-void
+inline void
 serializer_add_eof (serializer_t *serializer)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_EOF, SERIALIZER_FALSE, 0);
 }
 
-int
-serializer_add_key (serializer_t *serializer, char *key)
+inline int
+serializer_add_key (serializer_t *serializer, char *key, int key_length)
 {
     if (key != NULL)
     {
-        serializer_key_t key_info = serializer_key (key);
-        serializer->memory[serializer->index++] = key_info.size;
-        serializer_add_binary (serializer, SERIALIZATION_TYPE_NONE, key_info.string, key_info.size);
+        char length = serializer_min (key_length, 255);
+        serializer->memory[serializer->index++] = length;
+        serializer_add_binary (serializer, SERIALIZATION_TYPE_NONE, key, length);
     }
 }
 
-int
+inline int
 serializer_add_binary (serializer_t *serializer, serialization_types_t type, char *data, int size)
 {
     if (type == SERIALIZATION_TYPE_BLOB)
@@ -139,7 +141,7 @@ serializer_add_binary (serializer_t *serializer, serialization_types_t type, cha
     serializer->index += size;
 }
 
-void
+inline void
 serializer_allocate_if_required (serializer_t *serializer, long additional_size)
 {
     size_t copy = serializer->index;
@@ -163,7 +165,7 @@ serializer_allocate_if_required (serializer_t *serializer, long additional_size)
     serializer->memory = address;
 }
 
-int
+inline int
 serializer_add_type (
   serializer_t *serializer, serialization_types_t type, bool_t has_key, long size)
 {
@@ -180,7 +182,7 @@ serializer_add_type (
     serializer->memory[serializer->index++] = value;
 }
 
-int
+inline int
 serializer_get_typesize (serialization_types_t type, long size)
 {
     char byte_size;
@@ -207,7 +209,7 @@ serializer_get_typesize (serialization_types_t type, long size)
     return byte_size;
 }
 
-int
+inline int
 serializer_get_intsize (int size)
 {
     int copy_size;
@@ -219,7 +221,7 @@ serializer_get_intsize (int size)
     {
         copy_size = 1;
     }
-    else if (size < 0x1000000)
+    else if (size < 0x100000000)
     {
         copy_size = 2;
     }

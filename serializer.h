@@ -27,15 +27,15 @@ typedef struct serializer_key
 // Cannot have more than 16 types, as we are using 4 bits for this field
 typedef enum binary_serialization_types
 {
-	SERIALIZATION_TYPE_NONE = 0, // mostly similar to blob, but not actually a type
+    SERIALIZATION_TYPE_NONE = 0, // mostly similar to blob, but not actually a type
     SERIALIZATION_TYPE_CHAR = 1,
     SERIALIZATION_TYPE_SHORT,
     SERIALIZATION_TYPE_INT,
     SERIALIZATION_TYPE_LONG,
     SERIALIZATION_TYPE_FLOAT,
     SERIALIZATION_TYPE_DOUBLE,
-    SERIALIZATION_TYPE_BLOB, 
-	SERIALIZATION_TYPE_EOF = 0XF
+    SERIALIZATION_TYPE_BLOB,
+    SERIALIZATION_TYPE_EOF = 0XF
 } serialization_types_t;
 
 // Keep in mind that we need to add 1 to all of these values to get byte size
@@ -50,30 +50,32 @@ bool_t
 endianness_test ();
 serializer_t
 serializer_init ();
-serializer_key_t
-serializer_key (char *key);
+char
+serializer_min (int value, int min);
 void
 serializer_free (serializer_t serializer);
+void
+serializer_reset (serializer_t *serializer);
 
 void
-serializer_add_char (serializer_t *serializer, char *key, char value);
+serializer_add_char (serializer_t *serializer, char *key, int key_length, char value);
 int
-serializer_add_short (serializer_t *serializer, char *key, short value);
+serializer_add_short (serializer_t *serializer, char *key, int key_length, short value);
 void
-serializer_add_int (serializer_t *serializer, char *key, int value);
+serializer_add_int (serializer_t *serializer, char *key, int key_length, int value);
 void
-serializer_add_long (serializer_t *serializer, char *key, long value);
+serializer_add_long (serializer_t *serializer, char *key, int key_length, long value);
 void
-serializer_add_float (serializer_t *serializer, char *key, float value);
+serializer_add_float (serializer_t *serializer, char *key, int key_length, float value);
 void
-serializer_add_double (serializer_t *serializer, char *key, double value);
+serializer_add_double (serializer_t *serializer, char *key, int key_length, double value);
 void
-serializer_add_blob (serializer_t *serializer, char *key, char *value, long size);
+serializer_add_blob (serializer_t *serializer, char *key, int key_length, char *value, long size);
 void
 serializer_add_eof (serializer_t *serializer);
 
 int
-serializer_add_key (serializer_t *serializer, char *key);
+serializer_add_key (serializer_t *serializer, char *key, int key_length);
 int
 serializer_get_typesize (serialization_types_t type, long size);
 int
