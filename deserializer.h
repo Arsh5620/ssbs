@@ -28,6 +28,6 @@ deserializer_t
 deserializer_init (char *memory, int size);
 deserializer_value_t
 deserialize_next (deserializer_t *deserializer);
-my_list_s
-deserialize_all (deserializer_t *deserializer, my_list_s list);
+void
+deserialize_all (deserializer_t *deserializer, my_list_s *list);
 #endif

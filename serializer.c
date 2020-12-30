@@ -56,7 +56,7 @@ serializer_add_char (serializer_t *serializer, char *key, int key_length, char v
     serializer_add_binary (serializer, SERIALIZATION_TYPE_CHAR, (char *) &value, sizeof (char));
 }
 
-int
+void
 serializer_add_short (serializer_t *serializer, char *key, int key_length, short value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_SHORT, key != NULL, 0);
@@ -110,7 +110,7 @@ serializer_add_eof (serializer_t *serializer)
     serializer_add_type (serializer, SERIALIZATION_TYPE_EOF, SERIALIZER_FALSE, 0);
 }
 
-inline int
+inline void
 serializer_add_key (serializer_t *serializer, char *key, int key_length)
 {
     if (key != NULL)
@@ -121,7 +121,7 @@ serializer_add_key (serializer_t *serializer, char *key, int key_length)
     }
 }
 
-inline int
+inline void
 serializer_add_binary (serializer_t *serializer, serialization_types_t type, char *data, int size)
 {
     if (type == SERIALIZATION_TYPE_BLOB)
@@ -165,7 +165,7 @@ serializer_allocate_if_required (serializer_t *serializer, long additional_size)
     serializer->memory = address;
 }
 
-inline int
+inline void
 serializer_add_type (
   serializer_t *serializer, serialization_types_t type, bool_t has_key, long size)
 {
@@ -188,6 +188,10 @@ serializer_get_typesize (serialization_types_t type, long size)
     char byte_size;
     switch (type)
     {
+    case SERIALIZATION_TYPE_NONE:
+    case SERIALIZATION_TYPE_EOF:
+        byte_size = -1;
+        break;
     case SERIALIZATION_TYPE_CHAR:
         byte_size = SIZE_BYTE;
         break;

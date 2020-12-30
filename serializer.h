@@ -15,7 +15,7 @@ typedef struct binary_serializer
 enum binary_serializer_result
 {
     SERIALIZED,
-    FAILED
+    FAILED_SERIALIZING
 };
 
 typedef struct serializer_key
@@ -59,7 +59,7 @@ serializer_reset (serializer_t *serializer);
 
 void
 serializer_add_char (serializer_t *serializer, char *key, int key_length, char value);
-int
+void
 serializer_add_short (serializer_t *serializer, char *key, int key_length, short value);
 void
 serializer_add_int (serializer_t *serializer, char *key, int key_length, int value);
@@ -74,16 +74,16 @@ serializer_add_blob (serializer_t *serializer, char *key, int key_length, char *
 void
 serializer_add_eof (serializer_t *serializer);
 
-int
+void
 serializer_add_key (serializer_t *serializer, char *key, int key_length);
 int
 serializer_get_typesize (serialization_types_t type, long size);
 int
 serializer_get_intsize (int size);
-int
+void
 serializer_add_type (
   serializer_t *serializer, serialization_types_t type, bool_t has_key, long size);
-int
+void
 serializer_add_binary (serializer_t *serializer, serialization_types_t type, char *data, int size);
 void
 serializer_allocate_if_required (serializer_t *serializer, long additional_size);

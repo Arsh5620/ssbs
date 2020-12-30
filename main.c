@@ -2,6 +2,7 @@
 #include "deserializer.h"
 #include <time.h>
 
+#ifdef SSBS_DEBUG
 int
 main (int argc, char **argv)
 {
@@ -30,3 +31,4 @@ main (int argc, char **argv)
     list.count = 0;
     my_list_s result = deserialize_all (&deserializer, list);
 }
+#endif

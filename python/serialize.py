@@ -1,7 +1,7 @@
-import serializetypes
 from collections import namedtuple
 import sys
 import struct
+from python import serializetypes
 
 is_little_endian = sys.byteorder == 'little'
 

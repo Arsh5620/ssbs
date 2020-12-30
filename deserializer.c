@@ -59,13 +59,13 @@ deserialize_next (deserializer_t *deserializer)
     return deserialized;
 }
 
-my_list_s
-deserialize_all (deserializer_t *deserializer, my_list_s list)
+void
+deserialize_all (deserializer_t *deserializer, my_list_s *list)
 {
     while (deserializer->index < deserializer->size)
     {
         deserializer_value_t value = deserialize_next (deserializer);
-        if (value.read_type == SERIALIZATION_TYPE_EOF)
+        if (value.read_type == SERIALIZATION_TYPE_EOF || value.read_type == SERIALIZATION_TYPE_NONE)
         {
             break;
         }
@@ -73,14 +73,12 @@ deserialize_all (deserializer_t *deserializer, my_list_s list)
         value.index = deserializer->current_index;
         value.absolute_index = deserializer->current_absolute_index;
 
-        my_list_push (&list, (char *) &value);
+        my_list_push (list, (char *) &value);
 
         if (value.key != NULL)
         {
-            deserializer->current_index;
+            deserializer->current_index++;
         }
         deserializer->current_absolute_index++;
     }
-
-    return list;
 }
