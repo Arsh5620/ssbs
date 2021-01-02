@@ -1,5 +1,5 @@
 from collections import namedtuple
-import serializetypes
+from python import serializetypes
 import struct
 
 deserializer_value = namedtuple(
