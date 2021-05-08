@@ -1,4 +1,4 @@
-a.out
+*.out
 .vscode/
 *.o
 __pycache__

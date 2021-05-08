@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define LIST_INCREASE 128
+#define LIST_INCREASE 1024
 
 typedef struct array_list
 {

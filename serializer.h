@@ -5,7 +5,7 @@
 
 typedef char bool_t;
 
-typedef struct binary_serializer
+typedef  struct binary_serializer
 {
     char *memory;
     long index;
@@ -27,15 +27,15 @@ typedef struct serializer_key
 // Cannot have more than 16 types, as we are using 4 bits for this field
 typedef enum binary_serialization_types
 {
-    SERIALIZATION_TYPE_NONE = 0, // mostly similar to blob, but not actually a type
-    SERIALIZATION_TYPE_CHAR = 1,
-    SERIALIZATION_TYPE_SHORT,
-    SERIALIZATION_TYPE_INT,
-    SERIALIZATION_TYPE_LONG,
-    SERIALIZATION_TYPE_FLOAT,
-    SERIALIZATION_TYPE_DOUBLE,
-    SERIALIZATION_TYPE_BLOB,
-    SERIALIZATION_TYPE_EOF = 0XF
+    SERIALIZATION_TYPE_NONE = 0x00, // mostly similar to blob, but not actually a type
+    SERIALIZATION_TYPE_EOF = 0x10,
+    SERIALIZATION_TYPE_CHAR = 0x20,
+    SERIALIZATION_TYPE_SHORT = 0x31,
+    SERIALIZATION_TYPE_INT = 0x42,
+    SERIALIZATION_TYPE_LONG = 0x53,
+    SERIALIZATION_TYPE_FLOAT = 0x62,
+    SERIALIZATION_TYPE_DOUBLE = 0x73,
+    SERIALIZATION_TYPE_BLOB = 0x80,
 } serialization_types_t;
 
 // Keep in mind that we need to add 1 to all of these values to get byte size
@@ -49,7 +49,7 @@ typedef enum binary_serialization_types
 bool_t
 endianness_test ();
 serializer_t
-serializer_init ();
+serializer_init (long default_size);
 char
 serializer_min (int value, int min);
 void
@@ -75,16 +75,16 @@ void
 serializer_add_eof (serializer_t *serializer);
 
 void
-serializer_add_key (serializer_t *serializer, char *key, int key_length);
+serializer_add_key (serializer_t *serializer, char *key, unsigned char key_length);
 int
-serializer_get_typesize (serialization_types_t type, long size);
+serializer_get_typesize (serialization_types_t type);
 int
 serializer_get_intsize (int size);
 void
 serializer_add_type (
   serializer_t *serializer, serialization_types_t type, bool_t has_key, long size);
 void
-serializer_add_binary (serializer_t *serializer, serialization_types_t type, char *data, int size);
+serializer_add_binary (serializer_t *serializer, serialization_types_t type, char *data, long size);
 void
 serializer_allocate_if_required (serializer_t *serializer, long additional_size);
 #endif

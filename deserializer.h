@@ -3,16 +3,38 @@
 #include "serializer.h"
 #include "list.h"
 
+// Cannot have more than 16 types, as we are using 4 bits for this field
+typedef enum binary_deserialization_types
+{
+    DESERIALIZATION_TYPE_NONE = 0x00, // mostly similar to blob, but not actually a type
+    DESERIALIZATION_TYPE_EOF = 0x10,
+    DESERIALIZATION_TYPE_CHAR = 0x20,
+    DESERIALIZATION_TYPE_SHORT = 0x30,
+    DESERIALIZATION_TYPE_INT = 0x40,
+    DESERIALIZATION_TYPE_LONG = 0x50,
+    DESERIALIZATION_TYPE_FLOAT = 0x60,
+    DESERIALIZATION_TYPE_DOUBLE = 0x70,
+    DESERIALIZATION_TYPE_BLOB = 0x80,
+} deserialization_types_t;
+
 typedef struct deserializer_value
 {
-    int read_type;
-    bool_t little_endian;
-    char *key;
-    long key_size;
-    long value_1;
-    char *value_2;
-    long index;          // index is only for the index-based values (ones which don't have keys)
-    long absolute_index; // absolute_index is index for all the values
+    unsigned char type;
+    unsigned char *key;
+    unsigned char key_length;
+    char _unused;
+    union
+    {
+        long value_long;
+        int value_int;
+        short value_short;
+        char value_char;
+        float value_float;
+        double value_double;
+    };
+
+    char *value_pointer;
+    int absolute_index; // absolute_index is index for all the values
 } deserializer_value_t;
 
 typedef struct binary_deserializer

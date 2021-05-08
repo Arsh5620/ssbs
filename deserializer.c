@@ -20,13 +20,12 @@ deserialize_next (deserializer_t *deserializer)
     deserializer_value_t deserialized = {0};
 
     char magic = deserializer->memory[deserializer->index++];
-    deserialized.read_type = magic >> 4 & 0b1111;
-    deserialized.little_endian = magic >> 3 & 1;
+    deserialized.type = magic & 0xF0;
 
     bool_t has_key = magic >> 2 & 1;
     char size = (1 << (magic & 0b11));
 
-    if (deserialized.read_type == SERIALIZATION_TYPE_EOF)
+    if (deserialized.type == DESERIALIZATION_TYPE_EOF)
     {
         return deserialized;
     }
@@ -36,23 +35,23 @@ deserialize_next (deserializer_t *deserializer)
         char key_size = deserializer->memory[deserializer->index++];
         deserialized.key = deserializer->memory + deserializer->index;
         deserializer->index += key_size;
-        deserialized.key_size = key_size;
+        deserialized.key_length = key_size;
     }
 
     long value = 0;
     memcpy (&value, deserializer->memory + deserializer->index, size);
     deserializer->index += size;
 
-    if (is_little_endian != deserialized.little_endian)
+    if (is_little_endian != (magic >> 3 & 1))
     {
         value = __builtin_bswap64 (value);
     }
 
-    deserialized.value_1 = value;
+    deserialized.value_long = value;
 
-    if (deserialized.read_type == SERIALIZATION_TYPE_BLOB)
+    if (deserialized.type == DESERIALIZATION_TYPE_BLOB)
     {
-        deserialized.value_2 = deserializer->memory + deserializer->index;
+        deserialized.value_pointer = deserializer->memory + deserializer->index;
         deserializer->index += value;
     }
 
@@ -65,12 +64,12 @@ deserialize_all (deserializer_t *deserializer, my_list_s *list)
     while (deserializer->index < deserializer->size)
     {
         deserializer_value_t value = deserialize_next (deserializer);
-        if (value.read_type == SERIALIZATION_TYPE_EOF || value.read_type == SERIALIZATION_TYPE_NONE)
+        if (value.type == DESERIALIZATION_TYPE_EOF || value.type == DESERIALIZATION_TYPE_NONE)
         {
             break;
         }
 
-        value.index = deserializer->current_index;
+        // value.index = deserializer->current_index;
         value.absolute_index = deserializer->current_absolute_index;
 
         my_list_push (list, (char *) &value);

@@ -10,7 +10,7 @@ my_list_new (size_t count, size_t block)
     size_t size = (count * block);
     list.block = block;
     list.size = count;
-    list.address = calloc (size, 1);
+    list.address = malloc (size);
 
     assert (list.address != (void *) 0);
     return (list);
@@ -19,15 +19,14 @@ my_list_new (size_t count, size_t block)
 void
 my_list_grow (my_list_s *list)
 {
-    list->size += LIST_INCREASE;
+    list->size *= 1.4;
     size_t size = list->size * list->block;
-
     size_t copy = (list->count * list->block);
     char *address = realloc (list->address, size);
 
     if (NULL == address)
     {
-        address = calloc (size, 1);
+        address = malloc (size);
         assert (address != NULL);
 
         memcpy (address, list->address, copy);
