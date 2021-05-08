@@ -157,11 +157,12 @@ serializer_allocate_if_required (serializer_t *serializer, long additional_size)
         memcpy (address, serializer->memory, copy);
         free (serializer->memory); /* free the original memory space after copy */
     }
-    else
-    {
-        /* zero the memory after list->count elements */
-        memset (address + copy, 0, serializer->size - copy);
-    }
+    // This should be no longer needed if everything else is correct. 
+    // else
+    // {
+    //     /* zero the memory after list->count elements */
+    //     memset (address + copy, 0, serializer->size - copy);
+    // }
     serializer->memory = address;
 }
 

@@ -32,11 +32,11 @@ my_list_grow (my_list_s *list)
         memcpy (address, list->address, copy);
         free (list->address); /* free the original memory space after copy */
     }
-    else
-    {
-        /* zero the memory after list->count elements */
-        memset (address + copy, 0, size - copy);
-    }
+    // else
+    // {
+    //     /* zero the memory after list->count elements */
+    //     memset (address + copy, 0, size - copy);
+    // }
     list->address = address;
 }
 
