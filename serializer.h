@@ -5,7 +5,7 @@
 
 typedef char bool_t;
 
-typedef  struct binary_serializer
+typedef struct binary_serializer
 {
     char *memory;
     long index;

@@ -37,7 +37,7 @@ main (int argc, char **argv)
     hack1.struct_type = CUSTOM_STRUCT_TYPE_CODE;
 
     serializer_reset (&serializer);
-    for (int i = 0; i < 5000000; ++i)
+    for (int i = 0; i < 12000000; ++i)
     {
         serializer_add_int (&serializer, "my integer", 11, 9087987);
         serializer_add_blob (&serializer, "my string", 10, string, string_length);

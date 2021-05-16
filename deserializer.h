@@ -47,7 +47,7 @@ typedef struct binary_deserializer
 } deserializer_t;
 
 deserializer_t
-deserializer_init (char *memory, int size);
+deserializer_init (char *memory, long size);
 deserializer_value_t
 deserialize_next (deserializer_t *deserializer);
 void

@@ -4,7 +4,7 @@
 extern bool_t is_little_endian;
 
 inline deserializer_t
-deserializer_init (char *memory, int size)
+deserializer_init (char *memory, long size)
 {
     deserializer_t deserializer = {0};
     deserializer.memory = memory;
@@ -14,7 +14,10 @@ deserializer_init (char *memory, int size)
     return deserializer;
 }
 
-inline deserializer_value_t
+// NOTE
+// Do not inline absurdly big functions as they hurt performance
+// due to either page faults/instruction cache misses/register spilling
+deserializer_value_t
 deserialize_next (deserializer_t *deserializer)
 {
     deserializer_value_t deserialized = {0};

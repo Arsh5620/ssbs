@@ -42,12 +42,6 @@ serializer_free (serializer_t serializer)
     free (serializer.memory);
 }
 
-__attribute__ ((always_inline)) inline char
-serializer_min (int value, int min)
-{
-    return (char) (value > min ? min : value);
-}
-
 inline void
 serializer_add_char (serializer_t *serializer, char *key, int key_length, char value)
 {
@@ -115,10 +109,9 @@ serializer_add_key (serializer_t *serializer, char *key, unsigned char key_lengt
 {
     if (key != NULL)
     {
-        char length = serializer_min (key_length, 255);
-        serializer->memory[serializer->index++] = length;
-        memcpy (serializer->memory + serializer->index, key, length);
-        serializer->index += length;
+        serializer->memory [serializer->index++] = key_length;
+        memcpy (serializer->memory + serializer->index, key, key_length);
+        serializer->index += key_length;
     }
 }
 
