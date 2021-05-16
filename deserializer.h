@@ -44,12 +44,20 @@ typedef struct binary_deserializer
     long size;
     long current_index;
     long current_absolute_index;
+    bool_t copy_strings;
+    char *copy_string_memory;
+    long copy_string_index;
+    long copy_string_length;
 } deserializer_t;
 
 deserializer_t
-deserializer_init (char *memory, long size);
+deserializer_init (char *memory, long size, bool_t copy_strings);
 deserializer_value_t
 deserialize_next (deserializer_t *deserializer);
 void
 deserialize_all (deserializer_t *deserializer, my_list_s *list);
+void
+deserializer_allocate_if_required (deserializer_t *deserializer, long additional_size);
+void
+deserializer_free (deserializer_t deserializer);
 #endif

@@ -109,7 +109,7 @@ serializer_add_key (serializer_t *serializer, char *key, unsigned char key_lengt
 {
     if (key != NULL)
     {
-        serializer->memory [serializer->index++] = key_length;
+        serializer->memory[serializer->index++] = key_length;
         memcpy (serializer->memory + serializer->index, key, key_length);
         serializer->index += key_length;
     }
@@ -124,9 +124,10 @@ serializer_add_binary (serializer_t *serializer, serialization_types_t type, cha
         serializer->index += sizeof (long);
     }
 
-    if (serializer->index + size + 1024 > serializer->size)
+    long size_1 = size + 1024;
+    if (serializer->index + size_1 > serializer->size)
     {
-        serializer_allocate_if_required (serializer, size);
+        serializer_allocate_if_required (serializer, size_1);
     }
 
     memcpy (serializer->memory + serializer->index, data, size);
@@ -150,7 +151,7 @@ serializer_allocate_if_required (serializer_t *serializer, long additional_size)
         memcpy (address, serializer->memory, copy);
         free (serializer->memory); /* free the original memory space after copy */
     }
-    // This should be no longer needed if everything else is correct. 
+    // This should be no longer needed if everything else is correct.
     // else
     // {
     //     /* zero the memory after list->count elements */
