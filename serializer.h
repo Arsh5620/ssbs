@@ -70,7 +70,7 @@ serializer_add_float (serializer_t *serializer, char *key, int key_length, float
 void
 serializer_add_double (serializer_t *serializer, char *key, int key_length, double value);
 void
-serializer_add_blob (serializer_t *serializer, char *key, int key_length, char *value, long size);
+serializer_add_blob (serializer_t *serializer, char *key, unsigned char key_length, char *value, long size);
 void
 serializer_add_eof (serializer_t *serializer);
 

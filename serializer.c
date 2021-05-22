@@ -42,7 +42,7 @@ serializer_free (serializer_t serializer)
     free (serializer.memory);
 }
 
-inline void
+void
 serializer_add_char (serializer_t *serializer, char *key, int key_length, char value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_CHAR, key != NULL, 0);
@@ -50,7 +50,7 @@ serializer_add_char (serializer_t *serializer, char *key, int key_length, char v
     serializer_add_binary (serializer, SERIALIZATION_TYPE_CHAR, (char *) &value, sizeof (char));
 }
 
-inline void
+void
 serializer_add_short (serializer_t *serializer, char *key, int key_length, short value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_SHORT, key != NULL, 0);
@@ -58,7 +58,7 @@ serializer_add_short (serializer_t *serializer, char *key, int key_length, short
     serializer_add_binary (serializer, SERIALIZATION_TYPE_SHORT, (char *) &value, sizeof (short));
 }
 
-inline void
+void
 serializer_add_int (serializer_t *serializer, char *key, int key_length, int value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_INT, key != NULL, 0);
@@ -66,7 +66,7 @@ serializer_add_int (serializer_t *serializer, char *key, int key_length, int val
     serializer_add_binary (serializer, SERIALIZATION_TYPE_INT, (char *) &value, sizeof (int));
 }
 
-inline void
+void
 serializer_add_long (serializer_t *serializer, char *key, int key_length, long value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_LONG, key != NULL, 0);
@@ -74,7 +74,7 @@ serializer_add_long (serializer_t *serializer, char *key, int key_length, long v
     serializer_add_binary (serializer, SERIALIZATION_TYPE_LONG, (char *) &value, sizeof (long));
 }
 
-inline void
+void
 serializer_add_float (serializer_t *serializer, char *key, int key_length, float value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_FLOAT, key != NULL, 0);
@@ -82,7 +82,7 @@ serializer_add_float (serializer_t *serializer, char *key, int key_length, float
     serializer_add_binary (serializer, SERIALIZATION_TYPE_FLOAT, (char *) &value, sizeof (float));
 }
 
-inline void
+void
 serializer_add_double (serializer_t *serializer, char *key, int key_length, double value)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_DOUBLE, key != NULL, 0);
@@ -90,8 +90,9 @@ serializer_add_double (serializer_t *serializer, char *key, int key_length, doub
     serializer_add_binary (serializer, SERIALIZATION_TYPE_DOUBLE, (char *) &value, sizeof (double));
 }
 
-inline void
-serializer_add_blob (serializer_t *serializer, char *key, int key_length, char *value, long size)
+void
+serializer_add_blob (
+  serializer_t *serializer, char *key, unsigned char key_length, char *value, long size)
 {
     serializer_add_type (serializer, SERIALIZATION_TYPE_BLOB, key != NULL, size);
     serializer_add_key (serializer, key, key_length);
@@ -110,7 +111,26 @@ serializer_add_key (serializer_t *serializer, char *key, unsigned char key_lengt
     if (key != NULL)
     {
         serializer->memory[serializer->index++] = key_length;
-        memcpy (serializer->memory + serializer->index, key, key_length);
+        char *dest_address = serializer->memory + serializer->index;
+        // if (key_length & 0x3)
+        // {
+        //     for (size_t i = 0; i < key_length; i++)
+        //     {
+        //         *(dest_address + i) = key[i];
+        //     }
+        // }
+        // else
+        // {
+        //     for (size_t i = 0; i < key_length >> 2; i++)
+        //     {
+        //         *((int *) (dest_address) + i) = ((int *) key)[i];
+        //     }
+        // }
+
+        // For some reason memcpy is way too slow here. I think possibly because of additional checks that memcpy does
+        // and the fact that this function is called million times a seconds those additional checks add up
+        memcpy (serializer->memory + serializer->index, key, (long) key_length);
+        // memmove (serializer->memory + serializer->index, key, (long) key_length);
         serializer->index += key_length;
     }
 }
@@ -118,14 +138,14 @@ serializer_add_key (serializer_t *serializer, char *key, unsigned char key_lengt
 __attribute__ ((always_inline)) inline void
 serializer_add_binary (serializer_t *serializer, serialization_types_t type, char *data, long size)
 {
-    if (type == SERIALIZATION_TYPE_BLOB)
+    if (__builtin_expect (type == SERIALIZATION_TYPE_BLOB, 0))
     {
         *(long *) (serializer->memory + serializer->index) = size;
         serializer->index += sizeof (long);
     }
 
     long size_1 = size + 1024;
-    if (serializer->index + size_1 > serializer->size)
+    if (__builtin_expect (serializer->index + size_1 > serializer->size, 0))
     {
         serializer_allocate_if_required (serializer, size_1);
     }

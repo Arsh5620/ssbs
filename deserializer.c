@@ -34,12 +34,12 @@ deserialize_next (deserializer_t *deserializer)
     bool_t has_key = magic >> 2 & 1;
     char size = (1 << (magic & 0b11));
 
-    if (deserialized.type == DESERIALIZATION_TYPE_EOF)
+    if (__builtin_expect (deserialized.type == DESERIALIZATION_TYPE_EOF, 0))
     {
         return deserialized;
     }
 
-    if (has_key)
+    if (__builtin_expect (has_key, 1))
     {
         char key_size = deserializer->memory[deserializer->index++];
         deserialized.key = deserializer->memory + deserializer->index;
@@ -51,14 +51,14 @@ deserialize_next (deserializer_t *deserializer)
     memcpy (&value, deserializer->memory + deserializer->index, size);
     deserializer->index += size;
 
-    if (is_little_endian != (magic >> 3 & 1))
+    if (__builtin_expect (is_little_endian != (magic >> 3 & 1), 0))
     {
         value = __builtin_bswap64 (value);
     }
 
     deserialized.value_long = value;
 
-    if (deserialized.type == DESERIALIZATION_TYPE_BLOB)
+    if (__builtin_expect (deserialized.type == DESERIALIZATION_TYPE_BLOB, 0))
     {
         if (deserializer->copy_strings)
         {
@@ -112,7 +112,8 @@ deserialize_all (deserializer_t *deserializer, my_list_s *list)
     while (deserializer->index < deserializer->size)
     {
         deserializer_value_t value = deserialize_next (deserializer);
-        if (value.type == DESERIALIZATION_TYPE_EOF || value.type == DESERIALIZATION_TYPE_NONE)
+        if (__builtin_expect (
+              value.type == DESERIALIZATION_TYPE_EOF || value.type == DESERIALIZATION_TYPE_NONE, 0))
         {
             if (
               deserializer->copy_strings
