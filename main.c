@@ -46,7 +46,7 @@ main (int argc, char **argv)
     memcpy (buffer, memory, mem_strlen);
 
     serializer_reset (&serializer);
-    for (int i = 0; i < 1200999; ++i)
+    for (int i = 0; i < 12000999; ++i)
     {
         serializer_add_int (&serializer, "my integer\0", 12, 9087987);
         serializer_add_blob (&serializer, "my string\0\0", 12, string, string_length);

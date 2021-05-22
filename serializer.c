@@ -112,24 +112,32 @@ serializer_add_key (serializer_t *serializer, char *key, unsigned char key_lengt
     {
         serializer->memory[serializer->index++] = key_length;
         char *dest_address = serializer->memory + serializer->index;
-        // if (key_length & 0x3)
-        // {
-        //     for (size_t i = 0; i < key_length; i++)
-        //     {
-        //         *(dest_address + i) = key[i];
-        //     }
-        // }
-        // else
-        // {
-        //     for (size_t i = 0; i < key_length >> 2; i++)
-        //     {
-        //         *((int *) (dest_address) + i) = ((int *) key)[i];
-        //     }
-        // }
 
-        // For some reason memcpy is way too slow here. I think possibly because of additional checks that memcpy does
-        // and the fact that this function is called million times a seconds those additional checks add up
-        memcpy (serializer->memory + serializer->index, key, (long) key_length);
+        // Not the fastest code, but will be vectorized by GCC
+        if (key_length & 0x3)
+        {
+            for (size_t i = 0; i < key_length; i++)
+            {
+                *(dest_address + i) = key[i];
+            }
+        }
+        else if (key_length & 0x7)
+        {
+            for (size_t i = 0; i < key_length >> 2; i++)
+            {
+                *((int *) (dest_address) + i) = ((int *) key)[i];
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < key_length >> 2; i++)
+            {
+                *((long *) (dest_address) + i) = ((long *) key)[i];
+            }
+        }
+
+        // For some reason memcpy is way too slow here
+        // memcpy (serializer->memory + serializer->index, key, (long) key_length);
         // memmove (serializer->memory + serializer->index, key, (long) key_length);
         serializer->index += key_length;
     }
