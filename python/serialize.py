@@ -18,8 +18,7 @@ def serializer_add(serializer_memory, key, value):
         serializer_memory, key)
 
     if (type == serializetypes.SERIALIZATION_TYPE_BLOB):
-        serializer_memory += serializer_pack(
-            len(value), serializer_get_intsize(len(value)))
+        serializer_memory += serializer_pack(len(value))
 
     if isinstance(value, int):
         serializer_memory += value.to_bytes(1 <<
@@ -34,7 +33,7 @@ def serializer_add_eof(serializer_memory):
 
 def serializer_add_key(serializer_memory, key):
     if not key is None:
-        serializer_memory += (serializer_pack(len(key), 0))
+        serializer_memory += len(key).to_bytes(1, sys.byteorder)
         serializer_memory += (key.encode())
 
 
@@ -55,15 +54,8 @@ def serializer_check_type(value):
         return serializetypes.SERIALIZATION_TYPE_BLOB
 
 
-def serializer_pack(value, byte_width):
-    if byte_width == 0:
-        return value.to_bytes(1, sys.byteorder)
-    elif byte_width == 1:
-        return value.to_bytes(2, sys.byteorder)
-    elif byte_width == 2:
-        return value.to_bytes(4, sys.byteorder)
-    elif byte_width == 3:
-        return value.to_bytes(8, sys.byteorder)
+def serializer_pack(value):
+    return value.to_bytes(8, sys.byteorder)
 
 
 def serializer_add_type(serializer_memory, type, has_key, size):
@@ -85,9 +77,10 @@ def serializer_get_typesize(type, size):
     elif type == serializetypes.SERIALIZATION_TYPE_LONG or type == serializetypes.SERIALIZATION_TYPE_DOUBLE:
         return serializetypes.SIZE_8BYTES
     elif type == serializetypes.SERIALIZATION_TYPE_BLOB:
-        return serializer_get_intsize(size)
+        return 3
 
 
+# In python this is used to determine the size of integer
 def serializer_get_intsize(size):
     if (size < 0x100):
         return 0

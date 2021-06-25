@@ -19,6 +19,7 @@ struct custom_struct_hack
     char char1;
 };
 
+#ifndef S3
 int
 main (int argc, char **argv)
 {
@@ -89,3 +90,4 @@ main (int argc, char **argv)
     my_list_free (list);
     printf ("Deserializing total clocks taken: %ld\n", clock () - time1);
 }
+#endif
