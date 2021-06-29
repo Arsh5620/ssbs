@@ -12,5 +12,3 @@ This is a really simple binary serializer which supports serializing basic C dat
   - structs - with hacks
 
 See [this file](./main.c) for example usage
-
-NOTE: the python version of the serialization is not compatible with the C version
