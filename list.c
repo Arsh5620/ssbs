@@ -43,7 +43,7 @@ my_list_grow (my_list_s *list)
 size_t
 my_list_push (my_list_s *list, char *entry)
 {
-    if (__builtin_expect(list->count == list->size, 0))
+    if (__builtin_expect (list->count == list->size, 0))
     {
         my_list_grow (list);
     }

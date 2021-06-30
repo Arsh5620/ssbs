@@ -20,7 +20,7 @@ typedef enum binary_deserialization_types
 typedef struct deserializer_value
 {
     unsigned char type;
-    unsigned char *key;
+    char *key;
     unsigned char key_length;
     char _unused;
     union
