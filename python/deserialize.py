@@ -20,7 +20,7 @@ def deserialize_all(byte_data):
         parse, seek = deserialize_next(byte_data, seek, size, index , absolute_index)
         if (parse.read_type == serializetypes.SERIALIZATION_TYPE_EOF):
             break
-        if (parse.read_type != serializetypes.SERIALIZATION_TYPE_BLOB):
+        if (parse.key != None):
             index += 1
         absolute_index += 1
         list.append(parse)

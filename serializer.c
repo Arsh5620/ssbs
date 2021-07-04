@@ -152,7 +152,7 @@ serializer_add_binary (serializer_t *serializer, serialization_types_t type, cha
         serializer->index += sizeof (long);
     }
 
-    long size_1 = size + 1024;
+    long size_1 = size + 32;
     if (__builtin_expect (serializer->index + size_1 > serializer->size, 0))
     {
         serializer_allocate_if_required (serializer, size_1);
@@ -162,7 +162,7 @@ serializer_add_binary (serializer_t *serializer, serialization_types_t type, cha
     serializer->index += size;
 }
 
-void __attribute__ ((noinline))
+__attribute__ ((noinline)) void
 serializer_allocate_if_required (serializer_t *serializer, long additional_size)
 {
     size_t copy = serializer->index;

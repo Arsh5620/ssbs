@@ -46,12 +46,8 @@ typedef enum binary_serialization_types
 #define SERIALIZER_TRUE 1
 #define SERIALIZER_FALSE 0
 
-bool_t
-endianness_test ();
 serializer_t
 serializer_init (long default_size);
-char
-serializer_min (int value, int min);
 void
 serializer_free (serializer_t serializer);
 void
@@ -75,12 +71,13 @@ serializer_add_blob (
 void
 serializer_add_eof (serializer_t *serializer);
 
+bool_t
+endianness_test ();
+
 void
 serializer_add_key (serializer_t *serializer, char *key, unsigned char key_length);
 int
 serializer_get_typesize (serialization_types_t type);
-int
-serializer_get_intsize (int size);
 void
 serializer_add_type (
   serializer_t *serializer, serialization_types_t type, bool_t has_key, long size);

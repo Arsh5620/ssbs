@@ -9,7 +9,7 @@ my_list_new (size_t count, size_t block)
 
     size_t size = (count * block);
     list.block = block;
-    list.size = count;
+    list.capacity = count;
     list.address = malloc (size);
 
     assert (list.address != (void *) 0);
@@ -19,8 +19,8 @@ my_list_new (size_t count, size_t block)
 void
 my_list_grow (my_list_s *list)
 {
-    list->size *= 1.4;
-    size_t size = list->size * list->block;
+    list->capacity *= 1.4;
+    size_t size = list->capacity * list->block;
     size_t copy = (list->count * list->block);
     char *address = realloc (list->address, size);
 
@@ -43,7 +43,7 @@ my_list_grow (my_list_s *list)
 size_t
 my_list_push (my_list_s *list, char *entry)
 {
-    if (__builtin_expect (list->count == list->size, 0))
+    if (__builtin_expect (list->count == list->capacity, 0))
     {
         my_list_grow (list);
     }
